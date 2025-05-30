@@ -1,0 +1,161 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ApiService } from '../../services/api.service';
+import { ProcessResult, SystemStatus, JobStatus } from '../../models/invoice.model';
+import { interval, Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
+})
+export class DashboardComponent implements OnInit, OnDestroy {
+  status: SystemStatus | null = null;
+  jobStatus: JobStatus | null = null;
+  loading = false;
+  jobLoading = false;
+  processingResult: ProcessResult | null = null;
+  error: string | null = null;
+  jobError: string | null = null;
+  
+  // Para actualización automática
+  autoRefresh: boolean = false;
+  refreshSubscription: Subscription | null = null;
+  
+  constructor(private apiService: ApiService) { }
+
+  ngOnInit(): void {
+    this.getSystemStatus();
+    this.getJobStatus();
+  }
+  
+  ngOnDestroy(): void {
+    this.stopAutoRefresh();
+  }
+
+  getSystemStatus(): void {
+    this.loading = true;
+    this.apiService.getStatus().subscribe({
+      next: (data) => {
+        this.status = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Error al obtener estado del sistema';
+        this.loading = false;
+        console.error(err);
+      }
+    });
+  }
+  
+  getJobStatus(): void {
+    this.jobLoading = true;
+    this.apiService.getJobStatus().subscribe({
+      next: (data) => {
+        this.jobStatus = data;
+        this.jobLoading = false;
+      },
+      error: (err) => {
+        this.jobError = 'Error al obtener estado del job';
+        this.jobLoading = false;
+        console.error(err);
+      }
+    });
+  }
+
+  processEmails(async: boolean = true): void {
+    this.loading = true;
+    this.processingResult = null;
+    
+    this.apiService.processEmails(async).subscribe({
+      next: (result) => {
+        this.processingResult = result;
+        this.loading = false;
+        
+        // Si se ejecutó en segundo plano, esperar y actualizar estado
+        if (async && result.success) {
+          setTimeout(() => {
+            this.getSystemStatus();
+            this.getJobStatus();
+          }, 5000);
+        } else {
+          this.getSystemStatus();
+          this.getJobStatus();
+        }
+      },
+      error: (err) => {
+        this.error = 'Error al procesar correos';
+        this.loading = false;
+        console.error(err);
+      }
+    });
+  }
+  
+  startJob(): void {
+    this.jobLoading = true;
+    
+    this.apiService.startJob().subscribe({
+      next: (result) => {
+        this.jobStatus = result;
+        this.jobLoading = false;
+        this.startAutoRefresh();
+      },
+      error: (err) => {
+        this.jobError = 'Error al iniciar el job programado';
+        this.jobLoading = false;
+        console.error(err);
+      }
+    });
+  }
+  
+  stopJob(): void {
+    this.jobLoading = true;
+    
+    this.apiService.stopJob().subscribe({
+      next: (result) => {
+        this.jobStatus = result;
+        this.jobLoading = false;
+        this.stopAutoRefresh();
+      },
+      error: (err) => {
+        this.jobError = 'Error al detener el job programado';
+        this.jobLoading = false;
+        console.error(err);
+      }
+    });
+  }
+  
+  startAutoRefresh(): void {
+    this.autoRefresh = true;
+    
+    // Detener si ya hay una suscripción activa
+    this.stopAutoRefresh();
+    
+    // Actualizar cada 30 segundos
+    this.refreshSubscription = interval(30000).subscribe(() => {
+      this.getSystemStatus();
+      this.getJobStatus();
+    });
+  }
+  
+  stopAutoRefresh(): void {
+    this.autoRefresh = false;
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+      this.refreshSubscription = null;
+    }
+  }
+
+  onAutoRefreshChange(event: Event): void {
+    // Cast event.target to HTMLInputElement para acceder a la propiedad checked
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.startAutoRefresh();
+    } else {
+      this.stopAutoRefresh();
+    }
+  }
+
+  downloadExcel(): void {
+    window.location.href = this.apiService.getExcelUrl();
+  }
+}
