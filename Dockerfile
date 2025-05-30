@@ -11,15 +11,18 @@ COPY . .
 
 RUN npm run build --prod
 
-# Etapa de producción
-FROM nginx:alpine
+# Etapa de producción - Usando servidor Angular incluido
+FROM node:16-alpine
 
-# Copiar configuración personalizada de nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
+
+# Instalar servidor ligero http-server
+RUN npm install -g http-server
 
 # Copiar archivos de construcción
-COPY --from=build /app/dist/invoicesync-frontend /usr/share/nginx/html
+COPY --from=build /app/dist/invoicesync-frontend /app
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# Iniciar servidor HTTP en el puerto 80
+CMD ["http-server", "-p", "80", "--cors", "-a", "0.0.0.0"]
