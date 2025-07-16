@@ -41,8 +41,9 @@ export class ApiService {
 
   // Obtener la URL del archivo Excel
   getExcelUrl(): string {
-    return `${this.apiUrl}/excel`;
-  }
+  const timestamp = new Date().getTime();
+  return `${this.apiUrl}/excel?t=${timestamp}`;
+}
   
   // Iniciar job programado
   startJob(): Observable<JobStatus> {
