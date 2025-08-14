@@ -79,8 +79,16 @@
             </button>
             
             <button class="btn btn-outline-primary" [disabled]="loading || !(status && status.excel_exists)" (click)="downloadExcel()">
-              <i class="bi bi-file-earmark-excel"></i> Descargar Excel
+              <i class="bi bi-file-earmark-excel"></i> Descargar Excel Actual
             </button>
+            
+            <a class="btn btn-outline-success" routerLink="/excel-manager">
+              <i class="bi bi-folder"></i> Gestionar Excel Mensuales
+            </a>
+            
+            <a class="btn btn-outline-info" routerLink="/email-config">
+              <i class="bi bi-envelope-gear"></i> Configurar Correos
+            </a>
             
             <a class="btn btn-outline-secondary" routerLink="/upload">
               <i class="bi bi-upload"></i> Subir PDF Manual
@@ -192,6 +200,73 @@
 
           <div *ngIf="jobError" class="alert alert-danger mt-3">
             {{ jobError }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Archivos Excel Mensuales -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Archivos Excel Mensuales</h5>
+            <a class="btn btn-light btn-sm" routerLink="/excel-manager">
+              <i class="bi bi-folder"></i> Ver Todos
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div *ngIf="excelLoading" class="text-center">
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!excelLoading && excelFiles && excelFiles.files.length > 0">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Período</th>
+                    <th>Facturas</th>
+                    <th>Última Modificación</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let file of excelFiles.files.slice(0, 5)">
+                    <td>{{ formatYearMonth(file.year_month) }}</td>
+                    <td>
+                      <span class="badge bg-primary">{{ file.invoice_count }}</span>
+                    </td>
+                    <td>{{ file.last_modified | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-success" (click)="downloadExcelFile(file.year_month)">
+                        <i class="bi bi-download"></i> Descargar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div *ngIf="excelFiles.files.length > 5" class="text-center mt-3">
+              <a class="btn btn-outline-success" routerLink="/excel-manager">
+                Ver {{ excelFiles.total_count - 5 }} archivos más...
+              </a>
+            </div>
+          </div>
+
+          <div *ngIf="!excelLoading && (!excelFiles || excelFiles.files.length === 0) && !excelError" class="text-center text-muted">
+            <i class="bi bi-file-earmark-excel fs-1"></i>
+            <p class="mt-2">No hay archivos Excel generados</p>
+            <p>Los archivos se crean automáticamente al procesar facturas</p>
+          </div>
+
+          <div *ngIf="excelError" class="alert alert-danger">
+            {{ excelError }}
           </div>
         </div>
       </div>

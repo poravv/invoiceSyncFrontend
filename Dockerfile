@@ -11,18 +11,23 @@ COPY . .
 
 RUN npm run build --prod
 
-# Etapa de producción - Usando servidor Angular incluido
-FROM node:16-alpine
-
-WORKDIR /app
-
-# Instalar servidor ligero http-server
-RUN npm install -g http-server
+# Etapa de producción - Usando nginx
+FROM nginx:alpine
 
 # Copiar archivos de construcción
-COPY --from=build /app/dist/invoicesync-frontend /app
+COPY --from=build /app/dist/invoicesync-frontend /usr/share/nginx/html
+
+# Configurar nginx para SPA
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
-# Iniciar servidor HTTP en el puerto 80
-CMD ["http-server", "-p", "80", "--cors", "-a", "0.0.0.0"]
+CMD ["nginx", "-g", "daemon off;"]

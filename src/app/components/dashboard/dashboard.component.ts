@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ApiService } from '../../services/api.service';
-import { ProcessResult, SystemStatus, JobStatus } from '../../models/invoice.model';
+import { ProcessResult, SystemStatus, JobStatus, ExcelFileList } from '../../models/invoice.model';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
@@ -11,11 +11,14 @@ import { interval, Subscription } from 'rxjs';
 export class DashboardComponent implements OnInit, OnDestroy {
   status: SystemStatus | null = null;
   jobStatus: JobStatus | null = null;
+  excelFiles: ExcelFileList | null = null;
   loading = false;
   jobLoading = false;
+  excelLoading = false;
   processingResult: ProcessResult | null = null;
   error: string | null = null;
   jobError: string | null = null;
+  excelError: string | null = null;
   
   // Para actualización automática
   autoRefresh: boolean = false;
@@ -26,6 +29,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getSystemStatus();
     this.getJobStatus();
+    this.loadExcelFiles();
   }
   
   ngOnDestroy(): void {
@@ -57,6 +61,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.jobError = 'Error al obtener estado del job';
         this.jobLoading = false;
+        console.error(err);
+      }
+    });
+  }
+
+  loadExcelFiles(): void {
+    this.excelLoading = true;
+    this.excelError = null;
+    
+    this.apiService.getExcelFiles().subscribe({
+      next: (data) => {
+        this.excelFiles = data;
+        this.excelLoading = false;
+      },
+      error: (err) => {
+        this.excelError = 'Error al cargar archivos Excel';
+        this.excelLoading = false;
         console.error(err);
       }
     });
@@ -157,5 +178,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   downloadExcel(): void {
     window.location.href = this.apiService.getExcelUrl();
+  }
+
+  downloadExcelFile(yearMonth: string): void {
+    window.location.href = this.apiService.getExcelFileUrl(yearMonth);
+  }
+
+  formatYearMonth(yearMonth: string): string {
+    if (yearMonth.length !== 6) return yearMonth;
+    
+    const year = yearMonth.substring(0, 4);
+    const month = yearMonth.substring(4, 6);
+    const monthNames = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    
+    const monthIndex = parseInt(month, 10) - 1;
+    return `${monthNames[monthIndex]} ${year}`;
   }
 }

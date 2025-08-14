@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { SystemStatus, ProcessResult, JobStatus } from '../models/invoice.model';
+import { SystemStatus, ProcessResult, JobStatus, ExcelFileList, EmailConfig, EmailTestResult } from '../models/invoice.model';
 
 
 @Injectable({
@@ -39,11 +39,27 @@ export class ApiService {
     return this.http.post<ProcessResult>(`${this.apiUrl}/upload`, formData);
   }
 
-  // Obtener la URL del archivo Excel
+  // Obtener la URL del archivo Excel (depreciado - mantener para compatibilidad)
   getExcelUrl(): string {
-  const timestamp = new Date().getTime();
-  return `${this.apiUrl}/excel?t=${timestamp}`;
-}
+    const timestamp = new Date().getTime();
+    return `${this.apiUrl}/excel?t=${timestamp}`;
+  }
+
+  // Obtener lista de archivos Excel mensuales
+  getExcelFiles(): Observable<ExcelFileList> {
+    return this.http.get<ExcelFileList>(`${this.apiUrl}/excel/list`);
+  }
+
+  // Descargar archivo Excel específico por año-mes
+  getExcelFileUrl(yearMonth: string): string {
+    const timestamp = new Date().getTime();
+    return `${this.apiUrl}/excel/${yearMonth}?t=${timestamp}`;
+  }
+
+  // Probar configuración de email
+  testEmailConfig(config: EmailConfig): Observable<EmailTestResult> {
+    return this.http.post<EmailTestResult>(`${this.apiUrl}/email-config/test`, config);
+  }
   
   // Iniciar job programado
   startJob(): Observable<JobStatus> {

@@ -1,0 +1,74 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestión de Archivos Excel</h2>
+        <button class="btn btn-primary" (click)="loadExcelFiles()">
+          <i class="bi bi-arrow-clockwise"></i> Actualizar
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando archivos...</span>
+        </div>
+        <p class="mt-2">Cargando lista de archivos Excel...</p>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <div *ngIf="!loading && excelFiles.length === 0 && !error" class="text-center">
+        <i class="bi bi-file-earmark-excel fs-1 text-muted"></i>
+        <p class="mt-2 text-muted">No hay archivos Excel generados aún</p>
+        <p class="text-muted">Los archivos se generan automáticamente cuando se procesan facturas</p>
+      </div>
+
+      <div *ngIf="!loading && excelFiles.length > 0" class="row">
+        <div class="col-12 mb-3">
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            <strong>Total de archivos:</strong> {{ totalFiles }}
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4" *ngFor="let file of excelFiles">
+          <div class="card h-100">
+            <div class="card-header bg-success text-white">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-file-earmark-excel"></i>
+                {{ formatYearMonth(file.year_month) }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12 mb-2">
+                  <strong>Archivo:</strong>
+                  <span class="text-muted d-block small">{{ file.filename }}</span>
+                </div>
+                <div class="col-6 mb-2">
+                  <strong>Tamaño:</strong>
+                  <span class="d-block">{{ formatFileSize(file.size) }}</span>
+                </div>
+                <div class="col-6 mb-2">
+                  <strong>Facturas:</strong>
+                  <span class="d-block">{{ file.invoice_count }}</span>
+                </div>
+                <div class="col-12 mb-2">
+                  <strong>Última modificación:</strong>
+                  <span class="d-block small">{{ file.last_modified | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-primary w-100" (click)="downloadExcel(file)">
+                <i class="bi bi-download"></i> Descargar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
