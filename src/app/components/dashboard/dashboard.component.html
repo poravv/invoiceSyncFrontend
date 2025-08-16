@@ -1,16 +1,19 @@
 <div class="container mt-4">
-  <div class="row">
-    <div class="col-12 text-center mb-4">
-      <h1 class="display-4">InvoiceSync</h1>
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <h1 class="display-4 mb-2">
+        <i class="bi bi-file-earmark-text" style="font-size: 50px;"></i> InvoiceSync
+      </h1>
       <p class="lead">Extracción inteligente de facturas desde correos</p>
     </div>
   </div>
 
-  <div class="row">
+  <div class="row g-4">
     <!-- Estado del sistema -->
-    <div class="col-md-4 mb-4">
-      <div class="card h-100">
-        <div class="card-header bg-primary text-white">
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+          <i class="bi bi-info-circle me-2"></i>
           <h5 class="card-title mb-0">Estado del Sistema</h5>
         </div>
         <div class="card-body">
@@ -22,38 +25,34 @@
 
           <div *ngIf="!loading && status">
             <div class="mb-3">
-              <span class="badge rounded-pill" [ngClass]="status.status === 'active' ? 'bg-success' : 'bg-danger'">
+              <span class="badge rounded-pill px-3 py-2" [ngClass]="status.status === 'active' ? 'bg-success' : 'bg-danger'">
+                <i class="bi" [ngClass]="status.status === 'active' ? 'bi-check-circle' : 'bi-x-circle'"></i>
                 {{ status.status === 'active' ? 'Activo' : 'Inactivo' }}
               </span>
             </div>
-            
             <div class="mb-2">
-              <strong>Correo configurado:</strong>
+              <i class="bi bi-envelope"></i> <strong>Correo:</strong>
               <span class="badge rounded-pill ms-2" [ngClass]="status.email_configured ? 'bg-success' : 'bg-warning'">
                 {{ status.email_configured ? 'Sí' : 'No' }}
               </span>
             </div>
-            
             <div class="mb-2">
-              <strong>OpenAI configurado:</strong>
+              <i class="bi bi-robot"></i> <strong>OpenAI:</strong>
               <span class="badge rounded-pill ms-2" [ngClass]="status.openai_configured ? 'bg-success' : 'bg-warning'">
                 {{ status.openai_configured ? 'Sí' : 'No' }}
               </span>
             </div>
-            
             <div class="mb-2">
-              <strong>Excel generado:</strong>
+              <i class="bi bi-file-earmark-excel"></i> <strong>Excel:</strong>
               <span class="badge rounded-pill ms-2" [ngClass]="status.excel_exists ? 'bg-success' : 'bg-warning'">
                 {{ status.excel_exists ? 'Sí' : 'No' }}
               </span>
             </div>
-            
             <div *ngIf="status.last_modified" class="mb-2">
-              <strong>Última actualización:</strong>
+              <i class="bi bi-clock-history"></i> <strong>Última actualización:</strong>
               <span class="ms-2">{{ status.last_modified | date:'dd/MM/yyyy HH:mm' }}</span>
             </div>
           </div>
-
           <div *ngIf="error" class="alert alert-danger">
             {{ error }}
           </div>
@@ -85,11 +84,6 @@
             <a class="btn btn-outline-success" routerLink="/excel-manager">
               <i class="bi bi-folder"></i> Gestionar Excel Mensuales
             </a>
-            
-            <a class="btn btn-outline-info" routerLink="/email-config">
-              <i class="bi bi-envelope-gear"></i> Configurar Correos
-            </a>
-            
             <a class="btn btn-outline-secondary" routerLink="/upload">
               <i class="bi bi-upload"></i> Subir PDF Manual
             </a>
