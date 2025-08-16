@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <div class="row mb-4">
     <div class="col-12 text-center">
-      <h1 class="display-4 mb-2">
+      <h1 class="display-4 mb-2 animate-fade-in">
         <i class="bi bi-file-earmark-text" style="font-size: 50px;"></i> InvoiceSync
       </h1>
       <p class="lead">Extracción inteligente de facturas desde correos</p>
@@ -25,7 +25,8 @@
 
           <div *ngIf="!loading && status">
             <div class="mb-3">
-              <span class="badge rounded-pill px-3 py-2" [ngClass]="status.status === 'active' ? 'bg-success' : 'bg-danger'">
+              <span class="badge rounded-pill px-3 py-2"
+                [ngClass]="status.status === 'active' ? 'bg-success' : 'bg-danger'">
                 <i class="bi" [ngClass]="status.status === 'active' ? 'bi-check-circle' : 'bi-x-circle'"></i>
                 {{ status.status === 'active' ? 'Activo' : 'Inactivo' }}
               </span>
@@ -76,11 +77,12 @@
             <button class="btn btn-primary" [disabled]="loading" (click)="processEmails(true)">
               <i class="bi bi-envelope"></i> Procesar Correos Ahora
             </button>
-            
-            <button class="btn btn-outline-primary" [disabled]="loading || !(status && status.excel_exists)" (click)="downloadExcel()">
+
+            <button class="btn btn-outline-primary" [disabled]="loading || !(status && status.excel_exists)"
+              (click)="downloadExcel()">
               <i class="bi bi-file-earmark-excel"></i> Descargar Excel Actual
             </button>
-            
+
             <a class="btn btn-outline-success" routerLink="/excel-manager">
               <i class="bi bi-folder"></i> Gestionar Excel Mensuales
             </a>
@@ -110,7 +112,7 @@
             <div class="alert" [ngClass]="processingResult.success ? 'alert-success' : 'alert-danger'">
               {{ processingResult.message }}
             </div>
-            
+
             <div *ngIf="processingResult.invoice_count && processingResult.invoice_count > 0" class="mt-3">
               <strong>Facturas procesadas:</strong> {{ processingResult.invoice_count }}
             </div>
@@ -147,7 +149,8 @@
                     <h5 class="card-title">Estado de la Automatización</h5>
                     <div class="mb-3">
                       <strong>Estado:</strong>
-                      <span class="badge rounded-pill ms-2" [ngClass]="jobStatus.running ? 'bg-success' : 'bg-secondary'">
+                      <span class="badge rounded-pill ms-2"
+                        [ngClass]="jobStatus.running ? 'bg-success' : 'bg-secondary'">
                         {{ jobStatus.running ? 'En ejecución' : 'Detenido' }}
                       </span>
                     </div>
@@ -175,14 +178,17 @@
                       La automatización funciona en segundo plano y procesa los correos según el intervalo configurado.
                     </p>
                     <div class="d-grid gap-2">
-                      <button *ngIf="!jobStatus.running" class="btn btn-success" [disabled]="jobLoading" (click)="startJob()">
+                      <button *ngIf="!jobStatus.running" class="btn btn-success" [disabled]="jobLoading"
+                        (click)="startJob()">
                         <i class="bi bi-play-fill"></i> Iniciar Automatización
                       </button>
-                      <button *ngIf="jobStatus.running" class="btn btn-danger" [disabled]="jobLoading" (click)="stopJob()">
+                      <button *ngIf="jobStatus.running" class="btn btn-danger" [disabled]="jobLoading"
+                        (click)="stopJob()">
                         <i class="bi bi-stop-fill"></i> Detener Automatización
                       </button>
                       <div class="form-check form-switch mt-2">
-                        <input class="form-check-input" type="checkbox" id="autoRefresh" [(ngModel)]="autoRefresh" (change)="onAutoRefreshChange($event)">
+                        <input class="form-check-input" type="checkbox" id="autoRefresh" [(ngModel)]="autoRefresh"
+                          (change)="onAutoRefreshChange($event)">
                         <label class="form-check-label" for="autoRefresh">Actualizar estado automáticamente</label>
                       </div>
                     </div>
@@ -253,7 +259,8 @@
             </div>
           </div>
 
-          <div *ngIf="!excelLoading && (!excelFiles || excelFiles.files.length === 0) && !excelError" class="text-center text-muted">
+          <div *ngIf="!excelLoading && (!excelFiles || excelFiles.files.length === 0) && !excelError"
+            class="text-center text-muted">
             <i class="bi bi-file-earmark-excel fs-1"></i>
             <p class="mt-2">No hay archivos Excel generados</p>
             <p>Los archivos se crean automáticamente al procesar facturas</p>
