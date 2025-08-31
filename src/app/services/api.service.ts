@@ -39,6 +39,22 @@ export class ApiService {
     return this.http.post<ProcessResult>(`${this.apiUrl}/upload`, formData);
   }
 
+  // Subir un archivo XML
+  uploadXml(file: File, metadata: {sender?: string, date?: string}): Observable<ProcessResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    if (metadata.sender) {
+      formData.append('sender', metadata.sender);
+    }
+
+    if (metadata.date) {
+      formData.append('date', metadata.date);
+    }
+
+    return this.http.post<ProcessResult>(`${this.apiUrl}/upload-xml`, formData);
+  }
+
   // Obtener la URL del archivo Excel (depreciado - mantener para compatibilidad)
   getExcelUrl(): string {
     const timestamp = new Date().getTime();
