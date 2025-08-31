@@ -3,14 +3,14 @@
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Configuración de Correos</h2>
-        <button class="btn btn-success" (click)="showAddForm = true" *ngIf="!showAddForm">
+        <button class="btn btn-primary" (click)="showAddForm = true" *ngIf="!showAddForm">
           <i class="bi bi-plus-circle"></i> Agregar Correo
         </button>
       </div>
 
       <!-- Formulario para agregar nueva configuración -->
       <div *ngIf="showAddForm" class="card mb-4">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header header-primary">
           <h5 class="card-title mb-0">Nueva Configuración de Correo</h5>
         </div>
         <div class="card-body">
@@ -20,7 +20,7 @@
               <label class="form-label">Proveedor de Correo</label>
               <div class="row">
                 <div class="col-md-3 mb-2" *ngFor="let provider of providers">
-                  <button type="button" class="btn btn-outline-secondary w-100" (click)="selectProvider(provider)">
+                  <button type="button" class="btn btn-outline-primary w-100" (click)="selectProvider(provider)">
                     {{ provider.name }}
                   </button>
                 </div>
@@ -92,7 +92,7 @@
             <!-- Botones de acción -->
             <div class="d-flex justify-content-between">
               <div>
-                <button type="button" class="btn btn-info me-2" (click)="testConfiguration(newConfig, -1)"
+                <button type="button" class="btn btn-outline-primary me-2" (click)="testConfiguration(newConfig, -1)"
                         [disabled]="testing[-1] || !newConfig.host || !newConfig.username || !newConfig.password">
                   <span *ngIf="testing[-1]" class="spinner-border spinner-border-sm me-1"></span>
                   <i *ngIf="!testing[-1]" class="bi bi-check-circle"></i>
@@ -105,7 +105,7 @@
                 </div>
               </div>
               <div>
-                <button type="button" class="btn btn-secondary me-2" (click)="cancelAdd()">
+                <button type="button" class="btn btn-soft-primary me-2" (click)="cancelAdd()">
                   Cancelar
                 </button>
                 <button type="submit" class="btn btn-primary" [disabled]="!emailForm.form.valid">
@@ -127,7 +127,7 @@
       <div *ngIf="emailConfigs.length > 0" class="row">
         <div class="col-md-6 col-lg-4 mb-4" *ngFor="let config of emailConfigs; let i = index">
           <div class="card h-100">
-            <div class="card-header bg-success text-white">
+            <div class="card-header header-secondary">
               <h5 class="card-title mb-0">
                 <i class="bi bi-envelope"></i>
                 {{ config.username }}
@@ -136,12 +136,12 @@
             <div class="card-body">
               <div class="mb-2">
                 <strong>Servidor:</strong> {{ config.host }}:{{ config.port }}
-                <span *ngIf="config.use_ssl" class="badge bg-success ms-1">SSL</span>
+                <span *ngIf="config.use_ssl" class="badge bg-primary ms-1">SSL</span>
               </div>
               <div class="mb-2">
                 <strong>Términos:</strong>
                 <div>
-                  <span class="badge bg-secondary me-1 mb-1" *ngFor="let term of config.search_terms">
+                  <span class="badge bg-primary me-1 mb-1" *ngFor="let term of config.search_terms">
                     {{ term }}
                   </span>
                 </div>
@@ -154,7 +154,7 @@
             </div>
             <div class="card-footer">
               <div class="d-grid gap-2">
-                <button class="btn btn-info btn-sm" (click)="testConfiguration(config, i)"
+                <button class="btn btn-outline-primary btn-sm" (click)="testConfiguration(config, i)"
                         [disabled]="testing[i]">
                   <span *ngIf="testing[i]" class="spinner-border spinner-border-sm me-1"></span>
                   <i *ngIf="!testing[i]" class="bi bi-check-circle"></i>

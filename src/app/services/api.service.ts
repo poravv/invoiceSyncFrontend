@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { SystemStatus, ProcessResult, JobStatus, ExcelFileList, EmailConfig, EmailTestResult } from '../models/invoice.model';
+import { SystemStatus, ProcessResult, JobStatus, ExcelFileList, EmailConfig, EmailTestResult, TaskSubmitResponse, TaskStatusResponse } from '../models/invoice.model';
 
 
 @Injectable({
@@ -55,6 +55,24 @@ export class ApiService {
     return this.http.post<ProcessResult>(`${this.apiUrl}/upload-xml`, formData);
   }
 
+  // Encolar carga de PDF
+  enqueueUploadPdf(file: File, metadata: {sender?: string, date?: string}): Observable<TaskSubmitResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (metadata.sender) formData.append('sender', metadata.sender);
+    if (metadata.date) formData.append('date', metadata.date);
+    return this.http.post<TaskSubmitResponse>(`${this.apiUrl}/tasks/upload-pdf`, formData);
+  }
+
+  // Encolar carga de XML
+  enqueueUploadXml(file: File, metadata: {sender?: string, date?: string}): Observable<TaskSubmitResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (metadata.sender) formData.append('sender', metadata.sender);
+    if (metadata.date) formData.append('date', metadata.date);
+    return this.http.post<TaskSubmitResponse>(`${this.apiUrl}/tasks/upload-xml`, formData);
+  }
+
   // Obtener la URL del archivo Excel (depreciado - mantener para compatibilidad)
   getExcelUrl(): string {
     const timestamp = new Date().getTime();
@@ -90,5 +108,15 @@ export class ApiService {
   // Obtener estado del job
   getJobStatus(): Observable<JobStatus> {
     return this.http.get<JobStatus>(`${this.apiUrl}/job/status`);
+  }
+
+  // Encolar procesamiento de correos
+  enqueueProcess(): Observable<TaskSubmitResponse> {
+    return this.http.post<TaskSubmitResponse>(`${this.apiUrl}/tasks/process`, {});
+  }
+
+  // Consultar estado de tarea
+  getTaskStatus(jobId: string): Observable<TaskStatusResponse> {
+    return this.http.get<TaskStatusResponse>(`${this.apiUrl}/tasks/${jobId}`);
   }
 }

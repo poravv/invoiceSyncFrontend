@@ -1,80 +1,86 @@
 <div class="container mt-4">
-  <div class="row mb-4">
-    <div class="col-12 text-center">
-      <h1 class="display-4 mb-2 animate-fade-in">
-        <i class="bi bi-file-earmark-text" style="font-size: 50px;"></i> InvoiceSync
-      </h1>
-      <p class="lead">Extracción inteligente de facturas desde correos</p>
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <h2 class="mb-1 animate-fade-in" style="font-weight:700;">
+            <i class="bi bi-file-earmark-text me-2" style="font-size: 1.25rem; color: var(--primary);"></i>
+            Panel de Control
+          </h2>
+          <div class="text-muted">Gestión y seguimiento de extracción de facturas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicador OpenAI movido al navbar -->
+
+  <!-- KPIs resumen -->
+  <div class="row g-3 mb-2" *ngIf="status">
+    <div class="col-sm-4">
+      <div class="stat-card">
+        <div class="label">Archivos Excel</div>
+        <div class="d-flex align-items-end justify-content-between mt-1">
+          <div class="value">{{ status.excel_files_count || 0 }}</div>
+          <span class="chip primary"><span class="dot"></span> {{ status.excel_exists ? 'Disponible' : 'Pendiente' }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="stat-card">
+        <div class="label">Cuentas de Correo</div>
+        <div class="d-flex align-items-end justify-content-between mt-1">
+          <div class="value">{{ status.email_configs_count || 0 }}</div>
+          <span class="chip" [ngClass]="status.email_configured ? 'success' : 'warning'">
+            <span class="dot"></span> {{ status.email_configured ? 'Configurado' : 'Incompleto' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4" *ngIf="jobStatus">
+      <div class="stat-card">
+        <div class="label">Automatización</div>
+        <div class="d-flex align-items-end justify-content-between mt-1">
+          <div class="value">{{ jobStatus.running ? 'ON' : 'OFF' }}</div>
+          <span class="chip" [ngClass]="jobStatus.running ? 'success' : 'danger'">
+            <span class="dot"></span> {{ jobStatus.running ? 'En ejecución' : 'Detenida' }}
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="row g-4">
     <!-- Estado del sistema -->
+    <!-- Estado del Sistema (comentado por solicitud) -->
+    <!--
     <div class="col-md-4">
       <div class="card h-100 shadow-sm">
-        <div class="card-header bg-primary text-white d-flex align-items-center">
+        <div class="card-header header-primary d-flex align-items-center">
           <i class="bi bi-info-circle me-2"></i>
           <h5 class="card-title mb-0">Estado del Sistema</h5>
         </div>
         <div class="card-body">
-          <div *ngIf="loading" class="text-center">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Cargando...</span>
-            </div>
-          </div>
-
-          <div *ngIf="!loading && status">
-            <div class="mb-3">
-              <span class="badge rounded-pill px-3 py-2"
-                [ngClass]="status.status === 'active' ? 'bg-success' : 'bg-danger'">
-                <i class="bi" [ngClass]="status.status === 'active' ? 'bi-check-circle' : 'bi-x-circle'"></i>
-                {{ status.status === 'active' ? 'Activo' : 'Inactivo' }}
-              </span>
-            </div>
-            <div class="mb-2">
-              <i class="bi bi-envelope"></i> <strong>Correo:</strong>
-              <span class="badge rounded-pill ms-2" [ngClass]="status.email_configured ? 'bg-success' : 'bg-warning'">
-                {{ status.email_configured ? 'Sí' : 'No' }}
-              </span>
-            </div>
-            <div class="mb-2">
-              <i class="bi bi-robot"></i> <strong>OpenAI:</strong>
-              <span class="badge rounded-pill ms-2" [ngClass]="status.openai_configured ? 'bg-success' : 'bg-warning'">
-                {{ status.openai_configured ? 'Sí' : 'No' }}
-              </span>
-            </div>
-            <div class="mb-2">
-              <i class="bi bi-file-earmark-excel"></i> <strong>Excel:</strong>
-              <span class="badge rounded-pill ms-2" [ngClass]="status.excel_exists ? 'bg-success' : 'bg-warning'">
-                {{ status.excel_exists ? 'Sí' : 'No' }}
-              </span>
-            </div>
-            <div *ngIf="status.last_modified" class="mb-2">
-              <i class="bi bi-clock-history"></i> <strong>Última actualización:</strong>
-              <span class="ms-2">{{ status.last_modified | date:'dd/MM/yyyy HH:mm' }}</span>
-            </div>
-          </div>
-          <div *ngIf="error" class="alert alert-danger">
-            {{ error }}
-          </div>
+          ...
         </div>
         <div class="card-footer">
-          <button class="btn btn-sm btn-outline-primary" (click)="getSystemStatus()">
+          <button class="btn btn-sm btn-soft-primary" (click)="getSystemStatus()">
             <i class="bi bi-arrow-clockwise"></i> Actualizar
           </button>
         </div>
       </div>
     </div>
+    -->
 
     <!-- Acciones -->
-    <div class="col-md-4 mb-4">
+    <div class="col-12 col-lg-6 mb-4">
       <div class="card h-100">
-        <div class="card-header bg-success text-white">
+        <div class="card-header header-secondary">
           <h5 class="card-title mb-0">Acciones</h5>
         </div>
         <div class="card-body">
           <div class="d-grid gap-3">
-            <button class="btn btn-primary" [disabled]="loading" (click)="processEmails(true)">
+            <button class="btn btn-success" [disabled]="loading" (click)="processEmails(true)">
               <i class="bi bi-envelope"></i> Procesar Correos Ahora
             </button>
 
@@ -83,13 +89,13 @@
               <i class="bi bi-file-earmark-excel"></i> Descargar Excel Actual
             </button>
 
-            <a class="btn btn-outline-success" routerLink="/excel-manager">
+            <a class="btn btn-outline-primary" routerLink="/excel-manager">
               <i class="bi bi-folder"></i> Gestionar Excel Mensuales
             </a>
-            <a class="btn btn-outline-secondary" routerLink="/upload">
+            <a class="btn btn-outline-primary" routerLink="/upload">
               <i class="bi bi-upload"></i> Subir PDF Manual
             </a>
-            <a class="btn btn-outline-secondary" routerLink="/upload-xml">
+            <a class="btn btn-outline-primary" routerLink="/upload-xml">
               <i class="bi bi-upload"></i> Subir XML Manual
             </a>
           </div>
@@ -98,9 +104,9 @@
     </div>
 
     <!-- Resultado del proceso -->
-    <div class="col-md-4 mb-4">
+    <div class="col-12 col-lg-6 mb-4">
       <div class="card h-100">
-        <div class="card-header bg-info text-white">
+        <div class="card-header header-primary">
           <h5 class="card-title mb-0">Resultado del Proceso</h5>
         </div>
         <div class="card-body">
@@ -213,19 +219,19 @@
   <div class="row mt-4">
     <div class="col-12">
       <div class="card">
-        <div class="card-header bg-success text-white">
+        <div class="card-header header-secondary">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">Archivos Excel Mensuales</h5>
-            <a class="btn btn-light btn-sm" routerLink="/excel-manager">
+            <a class="btn btn-outline-primary btn-sm" routerLink="/excel-manager">
               <i class="bi bi-folder"></i> Ver Todos
             </a>
           </div>
         </div>
         <div class="card-body">
-          <div *ngIf="excelLoading" class="text-center">
-            <div class="spinner-border text-success" role="status">
-              <span class="visually-hidden">Cargando...</span>
-            </div>
+          <div *ngIf="excelLoading">
+            <div class="skeleton mb-2" style="height:24px; width:100%"></div>
+            <div class="skeleton mb-2" style="height:24px; width:100%"></div>
+            <div class="skeleton" style="height:24px; width:100%"></div>
           </div>
 
           <div *ngIf="!excelLoading && excelFiles && excelFiles.files.length > 0">
@@ -247,7 +253,7 @@
                     </td>
                     <td>{{ file.last_modified | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td>
-                      <button class="btn btn-sm btn-outline-success" (click)="downloadExcelFile(file.year_month)">
+                      <button class="btn btn-sm btn-outline-primary" (click)="downloadExcelFile(file.year_month)">
                         <i class="bi bi-download"></i> Descargar
                       </button>
                     </td>
@@ -256,7 +262,7 @@
               </table>
             </div>
             <div *ngIf="excelFiles.files.length > 5" class="text-center mt-3">
-              <a class="btn btn-outline-success" routerLink="/excel-manager">
+              <a class="btn btn-outline-primary" routerLink="/excel-manager">
                 Ver {{ excelFiles.total_count - 5 }} archivos más...
               </a>
             </div>
@@ -281,7 +287,7 @@
   <div *ngIf="processingResult?.invoices && processingResult?.invoices!.length > 0" class="row mt-4">
     <div class="col-12">
       <div class="card">
-        <div class="card-header bg-dark text-white">
+        <div class="card-header header-secondary">
           <h5 class="card-title mb-0">Últimas Facturas Procesadas</h5>
         </div>
         <div class="card-body">

@@ -3,40 +3,39 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-footer',
   template: `
-    <footer class="bg-light text-center text-lg-start mt-5">
-      <div class="container p-4">
-        <div class="row">
-          <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
-            <h5 class="text-uppercase">InvoiceSync</h5>
-            <p>
+    <footer class="app-footer mt-5">
+      <div class="container py-4">
+        <div class="row align-items-center">
+          <div class="col-md-6 mb-3 mb-md-0">
+            <div class="brand d-flex align-items-center mb-1">
+              <i class="bi bi-receipt me-2 text-primary"></i>
+              <strong>InvoiceSync</strong>
+            </div>
+            <div class="text-muted small">
               Automatización inteligente para la extracción de datos de facturas desde correos electrónicos.
-            </p>
+            </div>
           </div>
-          <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
-            <h5 class="text-uppercase">Enlaces</h5>
-            <ul class="list-unstyled mb-0">
-              <li>
-                <a routerLink="/" class="text-dark">Dashboard</a>
-              </li>
-              <li>
-                <a routerLink="/upload" class="text-dark">Subir PDF</a>
-              </li>
-            </ul>
+          <div class="col-md-6">
+            <nav class="footer-nav d-flex gap-3 justify-content-md-end">
+              <a class="link" routerLink="/">Dashboard</a>
+              <a class="link" routerLink="/excel-manager">Excel</a>
+              <a class="link" routerLink="/upload">Subir PDF</a>
+              <a class="link" routerLink="/upload-xml">Subir XML</a>
+            </nav>
           </div>
         </div>
       </div>
-      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+      <div class="bottom text-center py-3">
         © {{currentYear}} InvoiceSync
       </div>
     </footer>
   `,
   styles: [`
-    footer {
-      margin-top: 3rem;
-    }
-    .text-uppercase {
-      color: #3f51b5;
-    }
+    .app-footer { background: var(--color-surface); border-top: 1px solid var(--color-border); color: var(--color-text); }
+    .app-footer .brand strong { font-weight: 800; letter-spacing: .2px; }
+    .app-footer .footer-nav .link { color: var(--color-muted); text-decoration: none; font-weight: 600; }
+    .app-footer .footer-nav .link:hover { color: var(--primary); }
+    .app-footer .bottom { background: #F3F5FA; color: var(--color-muted); }
   `]
 })
 export class FooterComponent {

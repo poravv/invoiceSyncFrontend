@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { ProcessResult } from '../../models/invoice.model';
+import { ProcessResult, TaskSubmitResponse, TaskStatusResponse } from '../../models/invoice.model';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-upload-xml',
@@ -16,6 +17,8 @@ export class UploadXmlComponent implements OnInit {
   loading = false;
   result: ProcessResult | null = null;
   error: string | null = null;
+  jobId: string | null = null;
+  pollingSub: Subscription | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -63,16 +66,30 @@ export class UploadXmlComponent implements OnInit {
 
     const formData = this.uploadForm.value;
 
-    this.apiService.uploadXml(this.selectedFile, formData).subscribe({
-      next: (result) => {
-        this.result = result;
-        this.loading = false;
+    this.apiService.enqueueUploadXml(this.selectedFile, formData).subscribe({
+      next: (res: TaskSubmitResponse) => {
+        this.jobId = res.job_id;
+        this.pollingSub = interval(2000).subscribe(() => this.pollJob());
       },
       error: (err) => {
-        this.error = 'Error al procesar el archivo XML: ' + (err.error?.message || err.message || 'Error desconocido');
+        this.error = 'Error al encolar el archivo XML: ' + (err.error?.message || err.message || 'Error desconocido');
         this.loading = false;
         console.error(err);
       }
+    });
+  }
+
+  private pollJob(): void {
+    if (!this.jobId) return;
+    this.apiService.getTaskStatus(this.jobId).subscribe({
+      next: (st: TaskStatusResponse) => {
+        if (st.status === 'done' || st.status === 'error') {
+          if (this.pollingSub) { this.pollingSub.unsubscribe(); this.pollingSub = null; }
+          this.result = st.result || null;
+          this.loading = false;
+        }
+      },
+      error: (err) => console.error(err)
     });
   }
 
@@ -86,6 +103,7 @@ export class UploadXmlComponent implements OnInit {
     this.fileName = '';
     this.error = null;
     this.result = null;
+    this.jobId = null;
+    if (this.pollingSub) { this.pollingSub.unsubscribe(); this.pollingSub = null; }
   }
 }
-

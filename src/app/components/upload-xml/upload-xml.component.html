@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-md-8">
       <div class="card shadow-sm">
-        <div class="card-header bg-secondary text-white">
+        <div class="card-header header-primary">
           <h5 class="card-title mb-0"><i class="bi bi-upload"></i> Subir XML Manual</h5>
         </div>
         <div class="card-body">
@@ -26,12 +26,12 @@
             <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
             <div class="d-flex gap-2">
-              <button class="btn btn-secondary" type="submit" [disabled]="loading">
+              <button class="btn btn-success" type="submit" [disabled]="loading">
                 <span *ngIf="!loading"><i class="bi bi-cloud-upload"></i> Procesar XML</span>
                 <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
               </button>
-              <button type="button" class="btn btn-outline-secondary" (click)="resetForm()">Limpiar</button>
-              <button type="button" class="btn btn-outline-dark" (click)="goToDashboard()">Volver</button>
+              <button type="button" class="btn btn-outline-primary" (click)="resetForm()">Limpiar</button>
+              <button type="button" class="btn btn-outline-primary" (click)="goToDashboard()">Volver</button>
             </div>
           </form>
 
@@ -48,4 +48,3 @@
     </div>
   </div>
 </div>
-

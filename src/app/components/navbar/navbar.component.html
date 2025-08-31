@@ -1,14 +1,14 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg app-navbar">
       <div class="container">
-        <a class="navbar-brand" routerLink="/">
-          <i class="bi bi-receipt me-2"></i>
-          InvoiceSync
+        <a class="navbar-brand d-flex align-items-center" routerLink="/">
+          <i class="bi bi-receipt me-2" style="font-size: 1.3rem; color: var(--primary);"></i>
+          <span>InvoiceSync</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto align-items-lg-center">
             <li class="nav-item">
               <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
                 <i class="bi bi-speedometer2 me-1"></i> Dashboard
@@ -24,7 +24,24 @@
                 <i class="bi bi-upload me-1"></i> Subir PDF
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/upload-xml" routerLinkActive="active">
+                <i class="bi bi-upload me-1"></i> Subir XML
+              </a>
+            </li>
           </ul>
+          <div class="d-lg-flex d-none ms-3">
+            <span class="chip" [ngClass]="status?.openai_configured ? 'success' : 'danger'">
+              <span class="dot"></span>
+              OpenAI: {{ status?.openai_configured ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="d-lg-none mt-3">
+            <span class="chip" [ngClass]="status?.openai_configured ? 'success' : 'danger'">
+              <span class="dot"></span>
+              OpenAI: {{ status?.openai_configured ? 'Sí' : 'No' }}
+            </span>
+          </div>
         </div>
       </div>
     </nav>

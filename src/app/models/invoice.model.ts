@@ -22,7 +22,10 @@ export interface SystemStatus {
   excel_exists: boolean;
   last_modified?: string;
   temp_dir?: string;
+  excel_output_dir?: string;
+  excel_files_count?: number;
   email_configured: boolean;
+  email_configs_count?: number;
   openai_configured: boolean;
   job?: {
     running: boolean;
@@ -30,6 +33,7 @@ export interface SystemStatus {
     next_run?: string;
     last_run?: string;
   };
+  excel_files?: ExcelFile[];
 }
 
 export interface JobStatus {
@@ -38,6 +42,21 @@ export interface JobStatus {
   next_run?: string;
   last_run?: string;
   last_result?: ProcessResult;
+}
+
+export interface TaskSubmitResponse {
+  job_id: string;
+}
+
+export interface TaskStatusResponse {
+  job_id: string;
+  action: string;
+  status: 'queued' | 'running' | 'done' | 'error';
+  created_at?: number;
+  started_at?: number | null;
+  finished_at?: number | null;
+  message?: string | null;
+  result?: ProcessResult | null;
 }
 
 export interface ExcelFileList {

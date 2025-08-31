@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ApiService } from '../../services/api.service';
-import { ProcessResult, SystemStatus, JobStatus, ExcelFileList } from '../../models/invoice.model';
+import { ProcessResult, SystemStatus, JobStatus, ExcelFileList, TaskSubmitResponse, TaskStatusResponse } from '../../models/invoice.model';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
@@ -16,6 +16,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   jobLoading = false;
   excelLoading = false;
   processingResult: ProcessResult | null = null;
+  processingJobId: string | null = null;
+  processingPolling: Subscription | null = null;
   error: string | null = null;
   jobError: string | null = null;
   excelError: string | null = null;
@@ -84,28 +86,43 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   processEmails(async: boolean = true): void {
+    // Encolar proceso para evitar interferencia y obtener job_id
     this.loading = true;
     this.processingResult = null;
-    
-    this.apiService.processEmails(async).subscribe({
-      next: (result) => {
-        this.processingResult = result;
+    this.processingJobId = null;
+
+    this.apiService.enqueueProcess().subscribe({
+      next: (res: TaskSubmitResponse) => {
+        this.processingJobId = res.job_id;
+        // Polling hasta finalizar
+        this.processingPolling = interval(2000).subscribe(() => this.pollJob());
+      },
+      error: (err) => {
+        this.error = 'No se pudo encolar el procesamiento';
         this.loading = false;
-        
-        // Si se ejecutó en segundo plano, esperar y actualizar estado
-        if (async && result.success) {
-          setTimeout(() => {
-            this.getSystemStatus();
-            this.getJobStatus();
-          }, 5000);
-        } else {
+        console.error(err);
+      }
+    });
+  }
+
+  private pollJob(): void {
+    if (!this.processingJobId) return;
+    this.apiService.getTaskStatus(this.processingJobId).subscribe({
+      next: (st: TaskStatusResponse) => {
+        if (st.status === 'done' || st.status === 'error') {
+          if (this.processingPolling) {
+            this.processingPolling.unsubscribe();
+            this.processingPolling = null;
+          }
+          this.loading = false;
+          this.processingResult = st.result || null;
+          // refrescar estado
           this.getSystemStatus();
           this.getJobStatus();
+          this.loadExcelFiles();
         }
       },
       error: (err) => {
-        this.error = 'Error al procesar correos';
-        this.loading = false;
         console.error(err);
       }
     });

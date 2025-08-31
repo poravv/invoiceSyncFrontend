@@ -9,7 +9,7 @@
   <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
       <div class="card shadow">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header header-primary">
           <h5 class="card-title mb-0">Formulario de carga</h5>
         </div>
         
@@ -20,11 +20,11 @@
               <label for="file" class="form-label">Archivo PDF *</label>
               <div class="input-group">
                 <input type="file" class="form-control" id="file" accept=".pdf" (change)="onFileSelected($event)" [disabled]="loading">
-                <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('file').click()">
+                <button class="btn btn-outline-primary" type="button" onclick="document.getElementById('file').click()">
                   <i class="bi bi-upload"></i> Examinar
                 </button>
               </div>
-              <div *ngIf="fileName" class="mt-2 text-success">
+              <div *ngIf="fileName" class="mt-2 text-primary">
                 <i class="bi bi-file-earmark-pdf"></i> {{ fileName }}
               </div>
             </div>
@@ -42,12 +42,12 @@
             
             <!-- Botones de acción -->
             <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary" [disabled]="loading || !selectedFile">
+              <button type="submit" class="btn btn-success" [disabled]="loading || !selectedFile">
                 <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                 <i *ngIf="!loading" class="bi bi-cloud-upload"></i>
                 Procesar factura
               </button>
-              <button type="button" class="btn btn-outline-secondary" (click)="goToDashboard()">
+              <button type="button" class="btn btn-outline-primary" (click)="goToDashboard()">
                 <i class="bi bi-arrow-left"></i> Volver al dashboard
               </button>
             </div>
@@ -65,8 +65,8 @@
   <!-- Resultados del procesamiento -->
   <div *ngIf="result" class="row mt-4 justify-content-center">
     <div class="col-md-8 col-lg-6">
-      <div class="card shadow" [ngClass]="{'border-success': result.success, 'border-danger': !result.success}">
-        <div class="card-header" [ngClass]="{'bg-success text-white': result.success, 'bg-danger text-white': !result.success}">
+      <div class="card shadow">
+        <div class="card-header header-secondary">
           <h5 class="card-title mb-0">Resultado del procesamiento</h5>
         </div>
         <div class="card-body">
