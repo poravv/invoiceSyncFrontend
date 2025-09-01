@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { ProcessResult, SystemStatus, JobStatus, ExcelFileList, TaskSubmitResponse, TaskStatusResponse } from '../../models/invoice.model';
 import { interval, Subscription } from 'rxjs';
@@ -25,17 +25,97 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Para actualización automática
   autoRefresh: boolean = false;
   refreshSubscription: Subscription | null = null;
+  autoRefreshIntervalMs: number = 30000;
+  jobIntervalInput: number | null = null;
+  jobIntervalTouched = false;
+  private storageHandler: any;
+  private savePrefTimer: any = null;
   
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService, private cdr: ChangeDetectorRef) {
+    // Pre-cargar preferencia antes del render para que el check refleje el estado desde el inicio
+    const saved = localStorage.getItem('invoicesync:autoRefresh');
+    this.autoRefresh = (saved === 'true' || saved === 'True' || saved === '1');
+    const savedInt = localStorage.getItem('invoicesync:autoRefreshInterval');
+    if (savedInt) {
+      const val = parseInt(savedInt, 10);
+      if (!isNaN(val) && val >= 5000) this.autoRefreshIntervalMs = val;
+    }
+  }
 
   ngOnInit(): void {
+    // Restaurar preferencia de auto-refresco desde localStorage
+    // No forzar valor por defecto en storage para evitar sobreescribir 'true' tardío
+    // Si no existe, simplemente dejamos autoRefresh en su valor actual
+
     this.getSystemStatus();
     this.getJobStatus();
     this.loadExcelFiles();
+
+    // Consultar preferencia global del backend y sincronizar
+    this.apiService.getAutoRefreshPref().subscribe({
+      next: (pref) => {
+        const backendEnabled = !!pref.enabled;
+        const backendInterval = Math.max(5000, Number(pref.interval_ms) || this.autoRefreshIntervalMs);
+        let changed = false;
+        if (backendInterval !== this.autoRefreshIntervalMs) {
+          this.autoRefreshIntervalMs = backendInterval;
+          localStorage.setItem('invoicesync:autoRefreshInterval', String(this.autoRefreshIntervalMs));
+          changed = true;
+        }
+        if (backendEnabled !== this.autoRefresh) {
+          if (backendEnabled) { this.startAutoRefresh(); } else { this.stopAutoRefresh(); }
+          changed = true;
+        }
+        if (changed) this.cdr.detectChanges();
+      },
+      error: () => { /* si falla, seguimos con localStorage */ }
+    });
+
+    // Activar auto-refresco si la preferencia está habilitada
+    if (this.autoRefresh) {
+      this.startAutoRefresh();
+    }
+
+    // Sincronizar entre pestañas: escuchar cambios en localStorage
+    this.storageHandler = (e: StorageEvent) => {
+      if (!e) { return; }
+      if (e.key === 'invoicesync:autoRefresh' && e.newValue !== null) {
+        const enabled = (e.newValue === 'true' || e.newValue === 'True' || e.newValue === '1');
+        if (enabled && !this.autoRefresh) {
+          this.startAutoRefresh();
+          this.cdr.detectChanges();
+        } else if (!enabled && this.autoRefresh) {
+          this.stopAutoRefresh();
+          this.cdr.detectChanges();
+        }
+      }
+      if (e.key === 'invoicesync:autoRefreshInterval' && e.newValue !== null) {
+        const val = parseInt(e.newValue, 10);
+        if (!isNaN(val) && val >= 5000) {
+          this.autoRefreshIntervalMs = val;
+          if (this.autoRefresh) {
+            // Reiniciar con el nuevo intervalo
+            this.startAutoRefresh();
+          }
+          this.cdr.detectChanges();
+        }
+      }
+    };
+    window.addEventListener('storage', this.storageHandler);
+
+    // Eliminado el resync inmediato para evitar trabajo redundante
   }
   
   ngOnDestroy(): void {
     this.stopAutoRefresh();
+    if (this.processingPolling) {
+      this.processingPolling.unsubscribe();
+      this.processingPolling = null;
+    }
+    if (this.storageHandler) {
+      window.removeEventListener('storage', this.storageHandler);
+      this.storageHandler = null;
+    }
   }
 
   getSystemStatus(): void {
@@ -59,6 +139,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.jobStatus = data;
         this.jobLoading = false;
+        // Si el usuario aún no tocó el campo, prellenar con el valor del backend
+        if (!this.jobIntervalTouched && this.jobStatus?.interval_minutes) {
+          this.jobIntervalInput = this.jobStatus.interval_minutes;
+        }
       },
       error: (err) => {
         this.jobError = 'Error al obtener estado del job';
@@ -162,35 +246,77 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
   
-  startAutoRefresh(): void {
-    this.autoRefresh = true;
-    
-    // Detener si ya hay una suscripción activa
-    this.stopAutoRefresh();
-    
-    // Actualizar cada 30 segundos
-    this.refreshSubscription = interval(30000).subscribe(() => {
-      this.getSystemStatus();
-      this.getJobStatus();
-    });
-  }
-  
-  stopAutoRefresh(): void {
-    this.autoRefresh = false;
+  private unsubscribeRefresh(): void {
     if (this.refreshSubscription) {
       this.refreshSubscription.unsubscribe();
       this.refreshSubscription = null;
     }
   }
 
-  onAutoRefreshChange(event: Event): void {
-    // Cast event.target to HTMLInputElement para acceder a la propiedad checked
-    const checkbox = event.target as HTMLInputElement;
-    if (checkbox.checked) {
+  startAutoRefresh(): void {
+    this.autoRefresh = true;
+    // Reiniciar sin emitir eventos de storage falsos
+    this.unsubscribeRefresh();
+    // Actualizar periódicamente
+    this.refreshSubscription = interval(this.autoRefreshIntervalMs).subscribe(() => {
+      this.getSystemStatus();
+      this.getJobStatus();
+    });
+    // Persistir preferencia
+    localStorage.setItem('invoicesync:autoRefresh', 'true');
+    localStorage.setItem('invoicesync:autoRefreshInterval', String(this.autoRefreshIntervalMs));
+  }
+  
+  stopAutoRefresh(): void {
+    this.autoRefresh = false;
+    this.unsubscribeRefresh();
+    // Persistir preferencia
+    localStorage.setItem('invoicesync:autoRefresh', 'false');
+  }
+
+  setAutoRefreshInterval(ms: number): void {
+    this.autoRefreshIntervalMs = Math.max(5000, Number(ms) || 30000);
+    localStorage.setItem('invoicesync:autoRefreshInterval', String(this.autoRefreshIntervalMs));
+    if (this.autoRefresh) {
       this.startAutoRefresh();
-    } else {
-      this.stopAutoRefresh();
     }
+    this.scheduleSavePref();
+  }
+
+  applyJobInterval(): void {
+    if (!this.jobIntervalInput || this.jobIntervalInput < 1) return;
+    this.jobLoading = true;
+    this.apiService.setJobInterval(this.jobIntervalInput).subscribe({
+      next: (st) => { this.jobStatus = st; this.jobLoading = false; },
+      error: (err) => { this.jobError = 'No se pudo actualizar el intervalo'; this.jobLoading = false; console.error(err); }
+    });
+  }
+
+  onJobIntervalChange(val: any): void {
+    this.jobIntervalTouched = true;
+    const n = Number(val);
+    this.jobIntervalInput = isNaN(n) ? null : n;
+  }
+
+  isJobIntervalInvalid(): boolean {
+    return !this.jobIntervalInput || this.jobIntervalInput < 1;
+  }
+
+  onAutoRefreshToggle(enabled: boolean): void {
+    localStorage.setItem('invoicesync:autoRefresh', enabled ? 'true' : 'false');
+    if (enabled) this.startAutoRefresh(); else this.stopAutoRefresh();
+    this.scheduleSavePref();
+  }
+
+  private scheduleSavePref(): void {
+    if (this.savePrefTimer) {
+      clearTimeout(this.savePrefTimer);
+      this.savePrefTimer = null;
+    }
+    this.savePrefTimer = setTimeout(() => {
+      this.apiService.setAutoRefreshPref(this.autoRefresh, this.autoRefreshIntervalMs)
+        .subscribe({ next: () => {}, error: () => {} });
+    }, 300);
   }
 
   downloadExcel(): void {

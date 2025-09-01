@@ -11,6 +11,7 @@ import { UploadXmlComponent } from './components/upload-xml/upload-xml.component
 import { EmailConfigComponent } from './components/email-config/email-config.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { HelpComponent } from './components/help/help.component';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
@@ -23,7 +24,8 @@ import { AppRoutingModule } from './app-routing.module';
     ExcelManagerComponent,
     EmailConfigComponent,
     NavbarComponent,
-    FooterComponent
+    FooterComponent,
+    HelpComponent
   ],
   imports: [
     BrowserModule,

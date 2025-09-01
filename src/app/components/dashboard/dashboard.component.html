@@ -175,6 +175,40 @@
                       <strong>Última ejecución:</strong>
                       <span class="ms-2">{{ jobStatus.last_run | date:'dd/MM/yyyy HH:mm:ss' }}</span>
                     </div>
+                    <div class="row g-2">
+                      <div class="col-12"><strong>Auto refrescar panel web</strong></div>
+                      <div class="col-7">
+                        <select class="form-select" [ngModel]="autoRefreshIntervalMs" (ngModelChange)="setAutoRefreshInterval($event)">
+                          <option [ngValue]="15000">15 segundos</option>
+                          <option [ngValue]="30000">30 segundos</option>
+                          <option [ngValue]="60000">60 segundos</option>
+                        </select>
+                      </div>
+                      <div class="col-5 d-flex align-items-center">
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" id="autoRefresh2"
+                                 [(ngModel)]="autoRefresh" (ngModelChange)="onAutoRefreshToggle($event)"
+                                 [ngModelOptions]="{standalone: true}">
+                          <label class="form-check-label" for="autoRefresh2">Actualizar automáticamente</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row g-2 mt-1">
+                      <div class="col-12"><strong>Intervalo de automatización (minutos)</strong></div>
+                      <div class="col-7">
+                        <input type="number" class="form-control" min="1"
+                               [ngModel]="jobIntervalInput !== null ? jobIntervalInput : jobStatus?.interval_minutes"
+                               (ngModelChange)="onJobIntervalChange($event)"
+                               [class.is-invalid]="isJobIntervalInvalid()"
+                               placeholder="Ej: 60">
+                        <div class="invalid-feedback">Debe ser un número entero de 1 minuto o más.</div>
+                      </div>
+                      <div class="col-5">
+                        <button class="btn btn-outline-primary w-100" (click)="applyJobInterval()" [disabled]="jobLoading || isJobIntervalInvalid()">
+                          <i class="bi bi-save"></i> Guardar
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -195,11 +229,11 @@
                         (click)="stopJob()">
                         <i class="bi bi-stop-fill"></i> Detener Automatización
                       </button>
-                      <div class="form-check form-switch mt-2">
+                      <!-- <div class="form-check form-switch mt-2">
                         <input class="form-check-input" type="checkbox" id="autoRefresh" [(ngModel)]="autoRefresh"
                           (change)="onAutoRefreshChange($event)">
                         <label class="form-check-label" for="autoRefresh">Actualizar estado automáticamente</label>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                 </div>

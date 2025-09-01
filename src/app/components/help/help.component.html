@@ -1,0 +1,82 @@
+<div class="container my-4">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header header-primary d-flex align-items-center">
+          <i class="bi bi-journal-text me-2"></i>
+          <h5 class="card-title mb-0">Manual de uso – InvoiceSync</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">
+            Guía rápida y clara para usar la aplicación. 
+          </p>
+
+          <details class="help-item" open>
+            <summary>¿Qué es la automatización?</summary>
+            <p>
+              Es un proceso que, cada cierto tiempo, revisa tus correos, busca facturas y las procesa automáticamente.
+              Puedes activarlo o detenerlo desde el <b>panel principal</b> con los botones de “Automatización”.
+            </p>
+            <ul>
+              <li>Funciona en “bucle”: se ejecuta cada cierto número de minutos.</li>
+              <li>Si estás subiendo un archivo manual, la app espera su turno: <b>no se molestan entre sí</b>.</li>
+            </ul>
+          </details>
+
+          <details class="help-item">
+            <summary>¿Cómo subo facturas manualmente (PDF o XML)?</summary>
+            <p>
+              En el <b>menú de navegación</b> elige “Subir PDF” o “Subir XML”. Selecciona el archivo y confirma.
+            </p>
+            <ul>
+              <li>PDF: la app “lee” el documento con ayuda de inteligencia artificial.</li>
+              <li>XML (factura electrónica): se entiende de forma nativa; si es un XML distinto, igualmente se intentará procesar.</li>
+              <li>Las cargas manuales <b>se encolan</b>: verás el resultado cuando termine.</li>
+            </ul>
+          </details>
+
+          <details class="help-item">
+            <summary>Indicadores y alertas</summary>
+            <ul>
+              <li><b>OpenAI (menú superior):</b> “Sí” (verde) significa que la inteligencia artificial está disponible; “No” (rojo), que no lo está.</li>
+              <li>Tras cada proceso, verás un mensaje indicando si salió bien o si hubo algún problema.</li>
+            </ul>
+          </details>
+
+          <details class="help-item">
+            <summary>Panel principal: ¿qué significa cada parte?</summary>
+            <ul>
+              <li><b>Acciones:</b> botón para procesar correos ahora y accesos a gestión de Excel y cargas manuales.</li>
+              <li><b>Resultado del Proceso:</b> el último resultado (éxito o error) con un resumen claro.</li>
+              <li><b>Archivos Excel Mensuales:</b> listado de archivos generados por mes, con botón de descarga.</li>
+              <li><b>Resumen superior (tarjetas):</b>
+                <ul>
+                  <li><b>Archivos Excel:</b> cuántos Excel se han generado.</li>
+                  <li><b>Cuentas de Correo:</b> cuántas casillas están configuradas y si están listas.</li>
+                  <li><b>Automatización:</b> si está encendida o apagada.</li>
+                </ul>
+              </li>
+            </ul>
+          </details>
+
+          <details class="help-item">
+            <summary>Excel: descargar y usar</summary>
+            <ul>
+              <li>Puedes descargar cualquier Excel: <b>la descarga no cambia el archivo del servidor</b>.</li>
+              <li>Los valores se guardan como números (puedes hacer fórmulas). Moneda local sin decimales; otras monedas con 2 decimales.</li>
+              <li>Si una factura llega mejorada (por ejemplo, con un código válido), el sistema conserva la versión correcta automáticamente.</li>
+            </ul>
+          </details>
+
+          <details class="help-item">
+            <summary>Consejos rápidos</summary>
+            <ul>
+              <li>Si OpenAI está en “No”, aún puedes procesar XML; los PDF pueden requerir reintento cuando esté en “Sí”.</li>
+              <li>No hace falta detener la automatización para subir archivos manualmente: la app los ordena y procesa de a uno.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { SystemStatus, ProcessResult, JobStatus, ExcelFileList, EmailConfig, EmailTestResult, TaskSubmitResponse, TaskStatusResponse } from '../models/invoice.model';
+import { SystemStatus, ProcessResult, JobStatus, ExcelFileList, EmailConfig, EmailTestResult, TaskSubmitResponse, TaskStatusResponse, AutoRefreshPref } from '../models/invoice.model';
 
 
 @Injectable({
@@ -110,6 +110,11 @@ export class ApiService {
     return this.http.get<JobStatus>(`${this.apiUrl}/job/status`);
   }
 
+  // Ajustar intervalo del job (minutos)
+  setJobInterval(minutes: number): Observable<JobStatus> {
+    return this.http.post<JobStatus>(`${this.apiUrl}/job/interval`, { minutes });
+  }
+
   // Encolar procesamiento de correos
   enqueueProcess(): Observable<TaskSubmitResponse> {
     return this.http.post<TaskSubmitResponse>(`${this.apiUrl}/tasks/process`, {});
@@ -118,5 +123,14 @@ export class ApiService {
   // Consultar estado de tarea
   getTaskStatus(jobId: string): Observable<TaskStatusResponse> {
     return this.http.get<TaskStatusResponse>(`${this.apiUrl}/tasks/${jobId}`);
+  }
+
+  // Preferencias: Auto‑refresh
+  getAutoRefreshPref(): Observable<AutoRefreshPref> {
+    return this.http.get<AutoRefreshPref>(`${this.apiUrl}/prefs/auto-refresh`);
+  }
+
+  setAutoRefreshPref(enabled: boolean, interval_ms: number): Observable<AutoRefreshPref> {
+    return this.http.post<AutoRefreshPref>(`${this.apiUrl}/prefs/auto-refresh`, { enabled, interval_ms });
   }
 }

@@ -90,3 +90,10 @@ export interface EmailTestResult {
   search_test?: boolean;
   email_count?: number;
 }
+
+// Preferencias UI
+export interface AutoRefreshPref {
+  uid: string;
+  enabled: boolean;
+  interval_ms: number;
+}

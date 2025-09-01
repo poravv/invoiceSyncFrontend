@@ -1,0 +1,22 @@
+.section { font-weight: 700; margin-top: 1rem; margin-bottom: .5rem; }
+.card-body ul { margin-bottom: .75rem; }
+.card-body ul li { margin-bottom: .25rem; }
+
+.help-item { margin-bottom: .75rem; border: 1px solid var(--color-border); border-radius: .5rem; overflow: hidden; }
+.help-item > summary { cursor: pointer; padding: .6rem .9rem; background: #f8f8fb; font-weight: 700; }
+.help-item[open] > summary { background: #eef0fb; }
+.help-item > *:not(summary) { padding: .6rem .9rem; }
+
+/* Asegurar viñetas visibles y con sangría dentro de los desplegables */
+.help-item ul {
+  list-style: disc;
+  list-style-position: inside; /* evita que el overflow oculte la viñeta */
+  padding-left: 1.25rem;
+  margin-left: .25rem;
+}
+.help-item ul ul {
+  list-style: circle;
+  padding-left: 1.25rem;
+  margin-left: .25rem;
+}
+.help-item li { line-height: 1.45; }
