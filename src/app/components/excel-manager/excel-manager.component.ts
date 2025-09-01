@@ -12,6 +12,7 @@ export class ExcelManagerComponent implements OnInit {
   loading = false;
   error: string | null = null;
   totalFiles = 0;
+  downloading: string | null = null;
 
   constructor(private apiService: ApiService) { }
 
@@ -38,7 +39,43 @@ export class ExcelManagerComponent implements OnInit {
   }
 
   downloadExcel(file: ExcelFile): void {
-    window.location.href = this.apiService.getExcelFileUrl(file.year_month);
+    this.downloading = file.year_month;
+    
+    // Simulate download delay for better UX
+    setTimeout(() => {
+      window.location.href = this.apiService.getExcelFileUrl(file.year_month);
+      this.downloading = null;
+    }, 500);
+  }
+
+  previewFile(file: ExcelFile): void {
+    // Future implementation for file preview
+    console.log('Preview file:', file.filename);
+    // Could implement a modal or new tab with file preview
+  }
+
+  trackByFn(index: number, item: ExcelFile): string {
+    return item.year_month;
+  }
+
+  getTotalInvoices(): number {
+    return this.excelFiles.reduce((total, file) => total + file.invoice_count, 0);
+  }
+
+  getTotalSize(): string {
+    const totalBytes = this.excelFiles.reduce((total, file) => total + file.size, 0);
+    return this.formatFileSize(totalBytes);
+  }
+
+  getMonthRange(): string {
+    if (this.excelFiles.length === 0) return '0';
+    if (this.excelFiles.length === 1) return '1 mes';
+    
+    const sortedFiles = [...this.excelFiles].sort((a, b) => a.year_month.localeCompare(b.year_month));
+    const firstMonth = this.formatYearMonthShort(sortedFiles[0].year_month);
+    const lastMonth = this.formatYearMonthShort(sortedFiles[sortedFiles.length - 1].year_month);
+    
+    return `${firstMonth} - ${lastMonth}`;
   }
 
   formatFileSize(bytes: number): string {
@@ -63,5 +100,14 @@ export class ExcelManagerComponent implements OnInit {
     
     const monthIndex = parseInt(month, 10) - 1;
     return `${monthNames[monthIndex]} ${year}`;
+  }
+
+  private formatYearMonthShort(yearMonth: string): string {
+    if (yearMonth.length !== 6) return yearMonth;
+    
+    const year = yearMonth.substring(2, 4); // Solo últimos 2 dígitos del año
+    const month = yearMonth.substring(4, 6);
+    
+    return `${month}/${year}`;
   }
 }

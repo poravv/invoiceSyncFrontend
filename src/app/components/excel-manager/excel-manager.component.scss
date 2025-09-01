@@ -1,36 +1,231 @@
-.card {
-  transition: transform 0.2s ease-in-out;
+:host {
+  display: block;
+  background: #f8fafc;
+  min-height: 100vh;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  
+  .breadcrumb-item {
+    color: #6b7280;
+    font-size: 0.875rem;
+    
+    &.active {
+      color: #374151;
+      font-weight: 500;
+    }
+    
+    a {
+      color: #2b4eff;
+      text-decoration: none;
+      
+      &:hover {
+        color: #1e40af;
+      }
+    }
+  }
+}
+
+.card {
+  border: none !important;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.file-card {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 1rem 1rem 0 0;
+  }
+  
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
 }
 
 .card-header {
-  border-bottom: none;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 1rem 1rem 0 0 !important;
+  padding: 1.25rem !important;
+}
+
+.card-body {
+  padding: 1.25rem;
 }
 
 .card-footer {
-  background-color: transparent;
-  border-top: 1px solid rgba(0,0,0,.125);
+  background: transparent !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 0 0 1rem 1rem !important;
+  padding: 1.25rem;
+}
+
+.file-details {
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  
+  .detail-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+  }
+  
+  .detail-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+  }
+}
+
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  &:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  
+  .dropdown-item {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4b5563;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      color: #2b4eff;
+      background: rgba(43, 78, 255, 0.06);
+    }
+    
+    i {
+      color: #6b7280;
+      transition: color 0.2s ease;
+    }
+    
+    &:hover i {
+      color: #2b4eff;
+    }
+  }
 }
 
 .spinner-border {
   width: 3rem;
   height: 3rem;
+  
+  &.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+  }
 }
 
 .alert {
-  border-radius: 8px;
+  border: none;
+  border-radius: 0.75rem;
+  
+  &.alert-danger {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+    border-left: 4px solid #dc2626;
+  }
+  
+  .alert-heading {
+    color: inherit;
+    font-weight: 600;
+  }
 }
 
-.text-muted {
-  font-size: 0.9em;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-@media (max-width: 768px) {
-  .card-title {
-    font-size: 1rem;
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #1f2937;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+.fw-semibold {
+  font-weight: 600 !important;
+}
+
+@media (max-width: 767.98px) {
+  .detail-value {
+    max-width: 50%;
+    font-size: 0.8rem;
+  }
+  
+  .detail-label {
+    font-size: 0.8rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  .card-body,
+  .card-footer,
+  .card-header {
+    padding: 1rem !important;
   }
 }

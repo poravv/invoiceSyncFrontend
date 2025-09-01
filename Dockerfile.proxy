@@ -1,0 +1,30 @@
+# Multi-stage build para Frontend con Nginx Proxy
+FROM node:16-alpine as build
+
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY . .
+RUN npm run build --prod
+
+# Nginx con configuración de proxy
+FROM nginx:alpine
+
+# Copiar archivos del frontend construido
+COPY --from=build /app/dist/invoicesync-frontend /usr/share/nginx/html
+
+# Copiar configuración de nginx proxy (se monta como volumen)
+# La configuración se montará desde nginx/nginx-proxy.conf
+
+# Crear página de error personalizada
+RUN echo '<html><body><h1>InvoiceSync Temporalmente No Disponible</h1><p>El servicio se está reiniciando...</p></body></html>' > /usr/share/nginx/html/50x.html
+
+# Exponer puerto 80
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]
