@@ -115,7 +115,12 @@ export class ApiService {
     return this.http.post<JobStatus>(`${this.apiUrl}/job/interval`, { minutes });
   }
 
-  // Encolar procesamiento de correos
+  // Procesamiento directo sin cola de tareas
+  processEmailsDirect(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/process-direct`, {});
+  }
+
+  // Encolar procesamiento (usa TaskQueue)
   enqueueProcess(): Observable<TaskSubmitResponse> {
     return this.http.post<TaskSubmitResponse>(`${this.apiUrl}/tasks/process`, {});
   }
@@ -123,6 +128,16 @@ export class ApiService {
   // Consultar estado de tarea
   getTaskStatus(jobId: string): Observable<TaskStatusResponse> {
     return this.http.get<TaskStatusResponse>(`${this.apiUrl}/tasks/${jobId}`);
+  }
+
+  // Limpiar tareas antiguas
+  cleanupOldTasks(): Observable<{message: string, cleaned_count: number}> {
+    return this.http.delete<{message: string, cleaned_count: number}>(`${this.apiUrl}/tasks/cleanup`);
+  }
+
+  // Debug de tareas (solo para desarrollo)
+  debugTasks(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/tasks/debug`);
   }
 
   // Preferencias: Auto‑refresh

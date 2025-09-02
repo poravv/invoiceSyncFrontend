@@ -170,21 +170,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   processEmails(async: boolean = true): void {
-    // Encolar proceso para evitar interferencia y obtener job_id
     this.loading = true;
     this.processingResult = null;
-    this.processingJobId = null;
+    this.error = null;
 
-    this.apiService.enqueueProcess().subscribe({
-      next: (res: TaskSubmitResponse) => {
-        this.processingJobId = res.job_id;
-        // Polling hasta finalizar
-        this.processingPolling = interval(2000).subscribe(() => this.pollJob());
+    // Usar procesamiento directo en lugar del TaskQueue
+    this.apiService.processEmailsDirect().subscribe({
+      next: (result) => {
+        this.processingResult = result;
+        this.loading = false;
+        
+        // Actualizar estados después del procesamiento
+        setTimeout(() => {
+          this.getSystemStatus();
+          this.getJobStatus();
+          this.loadExcelFiles();
+        }, 1000);
       },
       error: (err) => {
-        this.error = 'No se pudo encolar el procesamiento';
+        this.error = err.error?.detail || 'Error al procesar correos';
         this.loading = false;
-        console.error(err);
+        console.error('Error procesando correos:', err);
       }
     });
   }
@@ -200,6 +206,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
           }
           this.loading = false;
           this.processingResult = st.result || null;
+          
+          // Si hay un error específico, mostrarlo
+          if (st.status === 'error') {
+            this.error = st.message || 'Error durante el procesamiento';
+          }
+          
           // refrescar estado
           this.getSystemStatus();
           this.getJobStatus();
@@ -207,7 +219,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
-        console.error(err);
+        console.error('Error consultando estado de tarea:', err);
+        // No detener el polling por un error de red temporal
       }
     });
   }
@@ -339,5 +352,53 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     const monthIndex = parseInt(month, 10) - 1;
     return `${monthNames[monthIndex]} ${year}`;
+  }
+
+  formatParaguayTime(dateTime: string): string {
+    try {
+      const date = new Date(dateTime);
+      return new Intl.DateTimeFormat('es-PY', {
+        timeZone: 'America/Asuncion',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(date);
+    } catch (error) {
+      console.error('Error formatting Paraguay time:', error);
+      return '--:--';
+    }
+  }
+
+  formatParaguayDateTime(dateTime: string): string {
+    try {
+      const date = new Date(dateTime);
+      return new Intl.DateTimeFormat('es-PY', {
+        timeZone: 'America/Asuncion',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(date).replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$1/$2/$3');
+    } catch (error) {
+      console.error('Error formatting Paraguay datetime:', error);
+      return 'N/A';
+    }
+  }
+
+  formatParaguayDate(dateTime: string): string {
+    try {
+      const date = new Date(dateTime);
+      return new Intl.DateTimeFormat('es-PY', {
+        timeZone: 'America/Asuncion',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date);
+    } catch (error) {
+      console.error('Error formatting Paraguay date:', error);
+      return 'N/A';
+    }
   }
 }
