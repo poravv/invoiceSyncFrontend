@@ -215,8 +215,12 @@
           <!-- Success/Error State -->
           <div *ngIf="!loading && processingResult" class="text-center py-2">
             <div class="mb-3">
-              <div [ngClass]="processingResult.success ? 'bg-success' : 'bg-danger'" class="bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                <i [ngClass]="processingResult.success ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'" class="fs-4"></i>
+              <!-- Círculo con icono más descriptivo -->
+              <div [ngClass]="processingResult.success ? 'bg-success' : 'bg-danger'" 
+                   class="bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" 
+                   style="width: 60px; height: 60px;">
+                <i [ngClass]="processingResult.success ? 'bi-check-circle-fill text-success' : 'bi-exclamation-triangle-fill text-danger'" 
+                   class="fs-4"></i>
               </div>
             </div>
             <h6 class="fw-semibold mb-2" [ngClass]="processingResult.success ? 'text-success' : 'text-danger'">
@@ -248,7 +252,7 @@
           <!-- Empty State -->
           <div *ngIf="!loading && !processingResult" class="text-center py-4">
             <div class="bg-light bg-opacity-50 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-              <i class="bi bi-play-circle text-muted fs-4"></i>
+              <i class="bi bi-envelope-open text-muted fs-4"></i>
             </div>
             <h6 class="fw-semibold text-muted">Listo para procesar</h6>
             <p class="text-muted small mb-0">Haz clic en "Procesar Correos" para comenzar la extracción</p>
