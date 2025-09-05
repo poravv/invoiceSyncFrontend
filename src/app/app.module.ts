@@ -12,6 +12,7 @@ import { EmailConfigComponent } from './components/email-config/email-config.com
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HelpComponent } from './components/help/help.component';
+import { InvoiceExplorerComponent } from './components/invoice-explorer/invoice-explorer.component';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
@@ -25,7 +26,8 @@ import { AppRoutingModule } from './app-routing.module';
     EmailConfigComponent,
     NavbarComponent,
     FooterComponent,
-    HelpComponent
+    HelpComponent,
+    InvoiceExplorerComponent
   ],
   imports: [
     BrowserModule,
